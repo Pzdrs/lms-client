@@ -1,0 +1,39 @@
+
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  margin-bottom: 4.5rem;
+}
+
+.button-smooth {
+  transition: background-color .5s;
+}
+
+.rank {
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 2px 5px;
+  text-transform: capitalize;
+
+  &.admin {
+    background-color: rebeccapurple;
+
+    &:after {
+      content: 'Admin';
+    }
+  }
+
+  &.user {
+    background-color: coral;
+
+    &:after {
+      content: 'User';
+    }
+  }
+}
