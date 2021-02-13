@@ -2,8 +2,9 @@
   <nav class="navbar sticky is-info is-bold" aria-label="main navigation">
     <!-- Navigation brand -->
     <div class="navbar-brand">
-      <router-link to="/" class="navbar-item">
-        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+      <router-link to="/dashboard" class="navbar-item" style="background-color: #167df0">
+        <i class="fas fa-book is-size-3"></i>
+        <p class="brand-text">LMS</p>
       </router-link>
 
       <!-- For mobile devices and tablets-->
@@ -11,7 +12,8 @@
         <i class="fas fa-user"></i>
       </router-link>
 
-      <a role="button" title="Navigation" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+      <a role="button" title="Navigation" class="navbar-burger" style="margin: auto 0;" aria-label="menu"
+         aria-expanded="false"
          data-target="navbar">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -19,58 +21,27 @@
       </a>
 
       <!-- For mobile devices and tablets-->
-      <router-link to="/sign-out" class="navbar-item is-hidden-desktop has-text-danger">
+      <a v-on:click="logout" class="navbar-item is-hidden-desktop has-text-danger">
         <i class="fas fa-sign-out-alt"></i>
-      </router-link>
+      </a>
     </div>
 
     <!-- Navigation bar -->
-    <div id="navbar" class="navbar-menu has-text-centered">
+    <div v-if="!blank" id="navbar" class="navbar-menu has-text-centered">
       <div class="navbar-start">
-        <router-link to="/" class="navbar-item is-active">Dashboard</router-link>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <router-link to="/books" class="navbar-item">
-            Books
-            <i class="fas fa-angle-down dropdown-arrow"></i>
-          </router-link>
-          <div class="navbar-dropdown">
-            <router-link to="/books" class="navbar-item">List</router-link>
-            <hr class="navbar-divider">
-            <router-link to="/books/create" class="navbar-item">Create</router-link>
-          </div>
-        </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <router-link to="/books" class="navbar-item">
-            Authors
-            <i class="fas fa-angle-down dropdown-arrow"></i>
-          </router-link>
-          <div class="navbar-dropdown">
-            <router-link to="/authors" class="navbar-item">List</router-link>
-            <hr class="navbar-divider">
-            <router-link to="/authors/create" class="navbar-item">Create</router-link>
-          </div>
-        </div>
-        <div class="navbar-item has-dropdown is-hoverable" v-if="user.isAdmin">
-          <router-link to="/users" class="navbar-item">
-            Users
-            <i class="fas fa-angle-down dropdown-arrow"></i>
-          </router-link>
-          <div class="navbar-dropdown">
-            <router-link to="/users" class="navbar-item">List</router-link>
-            <hr class="navbar-divider">
-            <router-link to="/users/create" class="navbar-item">Create</router-link>
-          </div>
-        </div>
-        <!-- For mobile devices and tablets-->
-        <div class="is-hidden-desktop">
-          <hr class="m-0">
-          <p class="navbar-item has-text-centered">Signed in as {{ user.username }}</p>
-        </div>
+        <router-link
+            v-for="route in links"
+            :to="route"
+            :key="route.path"
+            class="navbar-item"
+        >
+          {{ route.name }}
+        </router-link>
       </div>
       <div class="navbar-end">
         <!-- For desktop -->
         <div class="navbar-item has-dropdown is-hidden-touch is-hoverable">
-          <a role="button" class="navbar-item">
+          <a role="button" class="navbar-item has-text-white">
             <i class="fas fa-ellipsis-h"></i>
           </a>
           <div class="navbar-item navbar-dropdown">
@@ -79,10 +50,10 @@
               Profile
             </router-link>
             <hr class="navbar-divider">
-            <router-link to="/sign-out" class="navbar-item has-text-danger">
+            <a v-on:click="logout" class="navbar-item has-text-danger">
               <i class="fas fa-sign-out-alt mr-2 mt-1"></i>
               Sign out
-            </router-link>
+            </a>
           </div>
         </div>
         <p class="navbar-item is-hidden-touch">Signed in as {{ user.username }}</p>
@@ -93,23 +64,18 @@
 
 <script>
 import $ from 'jquery';
+import {createNamespacedHelpers} from 'vuex';
+
+const {mapGetters} = createNamespacedHelpers('Auth');
 
 export default {
   name: 'Navigation',
   components: {},
+  props: {
+    blank: Boolean
+  },
   data() {
-    return {
-      user: {
-        isAdmin: true,
-        _id: "5f85d1e6ac855b3eb849724a",
-        username: "Kokot1",
-        password: "$2a$10$zPWUHKNmxLw.JShI09UBf.xi9qybn5ig9GRp5IoBfL/PdW90aUDvi",
-        email: "petrbohac35@seznam.cz",
-        firstName: "Petr",
-        lastName: "Bohac",
-        registeredAt: "2020-10-13T16:12:22.484Z"
-      }
-    }
+    return {}
   },
   mounted() {
     $(document).ready(() => {
@@ -120,11 +86,28 @@ export default {
         $(".navbar-menu").toggleClass("is-active");
       });
     });
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('Auth/signOut');
+    }
+  },
+  computed: {
+    ...mapGetters({
+      user: "getUser"
+    }),
+    links() {
+      return this.$router.options.routes
+          .filter(route => route.meta && route.meta.navbar)
+          .filter(route => (route.meta.requiresAdmin && this.$store.getters["Auth/getUser"].isAdmin) || (!route.meta.requiresAdmin));
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
 .sticky {
   position: -webkit-sticky;
   position: sticky;
@@ -133,5 +116,11 @@ export default {
 
 .dropdown-arrow {
   margin: .25rem 0 0 .25rem;
+}
+
+.brand-text {
+  font-size: 2em;
+  margin-left: 15px;
+  font-weight: 600;
 }
 </style>

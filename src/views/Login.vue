@@ -1,7 +1,6 @@
 <template>
   <div class="login">
     <Hero title="Sign in to LMS"/>
-    <Navigation/>
     <div class="container">
       <div class="columns has-text-centered">
         <div class="
@@ -10,10 +9,13 @@
       is-8-tablet is-offset-2-tablet
       is-6-desktop is-offset-3-desktop
       is-4-widescreen is-offset-4-widescreen">
-          <form @submit.prevent="signIn" class="box">
+          <form @submit.prevent="login" class="box" v-if="nav === 'login'">
+            <div v-if="loginResult" class="notification is-danger is-light p-2">
+              {{ loginResult }}
+            </div>
             <div class="field">
               <div class="control has-icons-left">
-                <input class="input" type="text" placeholder="Username or email"
+                <input v-model="username" class="input" type="text" placeholder="Username or email"
                        autocomplete="on" required>
                 <span class="icon is-small is-left">
               <i class="fas fa-user"></i>
@@ -23,7 +25,7 @@
 
             <div class="field">
               <div class="control has-icons-left">
-                <input class="input" type="password" placeholder="Password"
+                <input v-model="password" class="input" type="password" placeholder="Password"
                        autocomplete="on" required>
                 <span class="icon is-small is-left">
               <i class="fas fa-lock"></i>
@@ -42,7 +44,8 @@
 
             <div class="field">
               <div class="control">
-                <button type="submit" class="button button-smooth is-outlined is-primary is-medium is-fullwidth">
+                <button type="submit"
+                        class="button button-smooth is-outlined is-primary is-medium is-fullwidth is-rounded">
                   <i class="fas fa-sign-in-alt mr-2"></i>
                   Sign In
                 </button>
@@ -50,11 +53,11 @@
             </div>
 
             <router-link to="/forgot-password">
-              <a>Forgot password?</a>
+              Forgot password?
             </router-link>
             &#128900;
             <router-link to="/signup">
-              <a>Don't have an account?</a>
+              Don't have an account?
             </router-link>
           </form>
         </div>
@@ -66,21 +69,36 @@
 <script>
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import Navigation from "@/components/Navigation";
 
 export default {
   name: 'Login',
-  components: {Navigation, Hero, Footer},
+  components: {Hero, Footer},
+  data() {
+    return {
+      username: '',
+      password: '',
+      loginResult: '',
+      email: '',
+      nav: 'login'
+    }
+  },
   methods: {
-    signIn: () => {
-
+    login() {
+      this.$store.dispatch('Auth/LOGIN', {
+        password: this.password,
+        username: this.username
+      }).then(response => {
+        this.loginResult = response.message;
+      })
+    },
+    changeNav(nav) {
+      this.nav = nav;
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-.button {
-  border-radius: 25px;
+.container {
+  margin-top: 3rem;
 }
-
 </style>

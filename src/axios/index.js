@@ -1,0 +1,20 @@
+import axios from 'axios';
+import store from "@/store";
+
+const api = axios.create({
+    baseURL: 'http://localhost:3000/api'
+});
+
+api.interceptors.request.use(req => {
+    req.headers.Authorization = store.getters["Auth/getAccessToken"];
+    return req;
+});
+
+export const quotes = axios.create({
+    baseURL: 'https://quotes-inspirational-quotes-motivational-quotes.p.rapidapi.com',
+    headers: {
+        "x-rapidapi-key": '534f71a2e0msh462d67c3f7a7428p1c0887jsn5098de42488a'
+    }
+});
+
+export default api;
