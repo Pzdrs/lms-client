@@ -25,15 +25,17 @@
                   You borrowed this book on
                   {{ formatBorrowedDate(book.date.from) }}.
                   <span v-if="new Date(book.date.to).getTime() - new Date(book.date.from) > 0">
-                    You have
-                  <strong>
-                    {{ daysLeft(book.date) }}
-                  </strong>
-                    more days to return it.
+                  You have
+                  <span v-if="daysLeft(book.date) >= 1">
+                    <strong>{{ daysLeft(book.date) }}</strong> more days to return it.
                   </span>
+                    <span v-else>
+                      <strong>{{ hoursLeft(book.date) }}</strong> more hours to return it.
+                    </span>
+                </span>
                   <span v-else>
-                    It reached it's expiration or you have already returned it.
-                  </span>
+                  It reached it's expiration or you have already returned it.
+                </span>
                 </p>
                 <p><strong>Pages:</strong> {{ book.pageCount }}</p>
                 <p><strong>ISBN:</strong> {{ book.isbn }}</p>
@@ -64,7 +66,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('Books/fetchMyBooks')
+    this.$store.dispatch('Books/fetchMyBooks');
   },
   methods: {
     changeNav(newNav) {
@@ -78,6 +80,9 @@ export default {
     },
     daysLeft(date) {
       return moment(date.to).diff(moment(date.from), 'days');
+    },
+    hoursLeft(date) {
+      return moment(date.to).diff(moment(date.from), 'hours');
     },
     normalizeName(title) {
       return require('diacritics').remove(title);
