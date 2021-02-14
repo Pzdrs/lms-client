@@ -19,7 +19,7 @@
             </p>
             <ul class="menu-list">
               <li>
-                <a @click="changeNav('books')" :class="isActive('books', 'book-update')">Books
+                <a @click="changeNav('books')" :class="isActive('books', 'book-update', 'book-borrow')">Books
                   <span class="is-pulled-right">{{ books.length }}</span>
                 </a>
               </li>
@@ -74,6 +74,10 @@
                 <div class="content">
                   <p><strong>Pages:</strong> {{ book.pageCount }}</p>
                   <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                  <button @click="borrowBook(book); changeNav('book-borrow')"
+                          class="button button-smooth is-outlined is-info"
+                          :disabled="isAvailable(book)">Borrow
+                  </button>
                 </div>
               </div>
             </article>
@@ -114,21 +118,18 @@
             </div>
           </div>
 
-          <div v-if="this.nav === 'author-create'">
-            <CreateAuthor/>
-          </div>
+          <CreateAuthor v-if="this.nav === 'author-create'"/>
 
-          <div v-if="this.nav === 'book-create'">
-            <CreateBook/>
-          </div>
+          <CreateBook v-if="this.nav === 'book-create'"/>
 
-          <div v-if="this.nav === 'book-update'">
-            <UpdateBook v-bind:book="bookToUpdate" @changeNav="changeNav"/>
-          </div>
+          <UpdateBook :book="bookToUpdate" @changeNav="changeNav"
+                      v-if="this.nav === 'book-update'"/>
 
-          <div v-if="this.nav === 'author-update'">
-            <UpdateAuthor v-bind:author="authorToUpdate" @changeNav="changeNav"/>
-          </div>
+          <UpdateAuthor :author="authorToUpdate" @changeNav="changeNav"
+                        v-if="this.nav === 'author-update'"/>
+
+          <BorrowBook :book="this.bookToBorrow" @changeNav="changeNav"
+                      v-if="this.nav === 'book-borrow'"/>
         </div>
       </div>
     </div>
@@ -146,6 +147,7 @@ import CreateAuthor from "@/components/CreateAuthor";
 import moment from 'moment';
 import UpdateBook from "@/components/UpdateBook";
 import UpdateAuthor from "@/components/UpdateAuthor";
+import BorrowBook from "@/components/BorrowBook";
 
 export default {
   name: "Books",
@@ -154,6 +156,7 @@ export default {
       filter: '',
       nav: 'books',
       bookToUpdate: {},
+      bookToBorrow: {},
       authorToUpdate: {}
     }
   },
@@ -195,6 +198,9 @@ export default {
               alert('An unexpected error occurred while deleting this book')
             })
     },
+    borrowBook(book) {
+      this.bookToBorrow = book;
+    },
     updateBook(book) {
       this.bookToUpdate = book;
     },
@@ -222,7 +228,7 @@ export default {
       }
     }
   },
-  components: {UpdateAuthor, UpdateBook, CreateAuthor, CreateBook, Footer, Hero, Navigation}
+  components: {BorrowBook, UpdateAuthor, UpdateBook, CreateAuthor, CreateBook, Footer, Hero, Navigation}
 }
 </script>
 

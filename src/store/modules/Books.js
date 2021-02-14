@@ -61,13 +61,16 @@ const actions = {
         if (!state.myBooks.length)
             axios('/history')
                 .then(res => {
+                    res.data.history.filter(history => new Date(history.date.to) > new Date()).forEach(history => {
+                        commit('setUnavailableBook', history.book)
+                    });
                     res.data.history.filter(history => history.user === store.getters["Auth/getUser"]._id).forEach(history => {
                         axios(`/history/${history._id}/extended`)
                             .then(res => {
                                 commit('setMyBook', res.data.history.book);
                             });
                     });
-                })
+                });
     },
     fetchUnavailableBooks: ({commit}) => {
         axios('/history')
@@ -77,20 +80,9 @@ const actions = {
                 })
             })
     },
-    reFetchMyBooks: ({commit}) => {
-        axios('/history')
-            .then(res => {
-                commit('flushMyBooks');
-                res.data.history.filter(history => new Date(history.date.to) > new Date()).forEach(history => {
-                    commit('setUnavailableBook', history.book)
-                })
-                res.data.history.filter(history => history.user === store.getters["Auth/getUser"]._id).forEach(history => {
-                    axios(`/history/${history._id}/extended`)
-                        .then(res => {
-                            commit('setMyBook', res.data.history.book);
-                        });
-                });
-            })
+    reFetchMyBooks: ({commit, dispatch}) => {
+        commit('flushMyBooks');
+        dispatch('fetchMyBooks');
     },
     fetchAllBooks: ({commit, state}) => {
         if (!state.allBooks.length)
@@ -143,10 +135,10 @@ const actions = {
             return response;
         });
     },
-    updateBook: (context, payload) => {
+    updateBook: ({dispatch}, payload) => {
         return axios.patch(`/books/${payload.id}`, payload.data).then(response => {
-            context.dispatch('reFetchAllBooks').then()
-            context.dispatch('reFetchMyBooks').then()
+            dispatch('reFetchAllBooks');
+            dispatch('reFetchMyBooks');
             return response;
         })
     },
@@ -155,6 +147,13 @@ const actions = {
             context.dispatch('reFetchAllAuthors').then();
             return response;
         })
+    },
+    borrowBook(context, payload) {
+        return axios
+            .post('/history', payload)
+            .then(res => {
+                return res;
+            });
     }
 };
 
