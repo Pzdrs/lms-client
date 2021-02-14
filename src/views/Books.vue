@@ -42,7 +42,7 @@
         </div>
         <div class="column is-10">
           <div class="container" v-if="this.nav === 'books'">
-            <article class="message is-primary5"
+            <article class="message"
                      v-for="book in books.filter(({title, isbn, author}) => (title.toLowerCase().includes(filter) || isbn.toLowerCase().includes(filter)))"
                      :key="book._id">
               <div class="message-header">

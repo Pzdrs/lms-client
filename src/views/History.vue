@@ -4,9 +4,29 @@
     <Navigation/>
     <div class="container is-fluid my-5">
       <div class="columns">
-        <div class="column is-2"></div>
+        <div class="column is-2">
+          <aside class="menu">
+            <p class="menu-label">
+              Search
+            </p>
+            <div class="control">
+              <input type="text" class="input" placeholder="Book/Author/User" v-model="filter.search">
+            </div>
+            <p class="menu-label">
+              Filters
+            </p>
+            <ul class="menu-list">
+
+            </ul>
+          </aside>
+        </div>
         <div class="column is-8">
-          <article class="message is-primary5" v-for="history in getHistory" :key="history._id">
+          <article class="message is-primary"
+                   v-for="history in getHistory.filter(({book, user}) =>
+                   (book.title.toLowerCase().includes(filter.search)) ||
+                   (book.author.firstName.toLowerCase().includes(filter.search) || book.author.lastName.toLowerCase().includes(filter.search)) ||
+                   (idToUser(user).firstName.toLowerCase().includes(filter.search) || idToUser(user).lastName.toLowerCase().includes(filter.search)))"
+                   :key="history._id">
             <div class="message-header">
                 <span>
                   <a style="text-decoration: none" target="_blank">
@@ -78,7 +98,9 @@ export default {
   name: "History",
   data() {
     return {
-      filter: ''
+      filter: {
+        search: ''
+      }
     }
   },
   components: {Navigation, Hero, Footer},
