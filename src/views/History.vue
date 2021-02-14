@@ -13,19 +13,21 @@
               <input type="text" class="input" placeholder="Book/Author/User" v-model="filter.search">
             </div>
             <p class="menu-label">
-              Filters
+              Filters <span class="coming-soon">Coming soon!</span>
             </p>
-            <ul class="menu-list">
-
-            </ul>
+            <label class="checkbox">
+              <input type="checkbox" v-model="filter.notReturned" disabled>
+              Not returned yet
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" v-model="filter.expired" disabled>
+              Expired
+            </label>
           </aside>
         </div>
         <div class="column is-8">
           <article class="message is-primary"
-                   v-for="history in getHistory.filter(({book, user}) =>
-                   (book.title.toLowerCase().includes(filter.search)) ||
-                   (book.author.firstName.toLowerCase().includes(filter.search) || book.author.lastName.toLowerCase().includes(filter.search)) ||
-                   (idToUser(user).firstName.toLowerCase().includes(filter.search) || idToUser(user).lastName.toLowerCase().includes(filter.search)))"
+                   v-for="history in applyFilters(getHistory)"
                    :key="history._id">
             <div class="message-header">
                 <span>
@@ -99,7 +101,9 @@ export default {
   data() {
     return {
       filter: {
-        search: ''
+        search: '',
+        expired: false,
+        notReturned: false
       }
     }
   },
@@ -134,11 +138,21 @@ export default {
     },
     borrowedPeriod(date) {
       return Math.ceil(moment(new Date(date.to)).diff(new Date(date.from), 'h') / 24);
+    },
+    applyFilters(history) {
+      return history.filter(({book, user}) =>
+          (book.title.toLowerCase().includes(this.filter.search)) ||
+          (book.author.firstName.toLowerCase().includes(this.filter.search) || book.author.lastName.toLowerCase().includes(this.filter.search)) ||
+          (this.idToUser(user).firstName.toLowerCase().includes(this.filter.search) || this.idToUser(user).lastName.toLowerCase().includes(this.filter.search)));
     }
   }
 }
 </script>
 
 <style scoped>
-
+.coming-soon {
+  font-weight: bold;
+  color: black;
+  text-transform: uppercase;
+}
 </style>
