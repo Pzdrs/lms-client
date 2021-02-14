@@ -82,6 +82,8 @@ export default {
       })
           .then(() => {
             this.$store.dispatch('Books/reFetchMyBooks');
+            if (this.$store.getters["Auth/getUser"].isAdmin)
+              this.$store.dispatch('Books/reFetchHistory');
             alert(`You successfully borrowed ${this.book.title}. You have ${this.period} day(s) to return it.`)
             this.changeNavOuter('books');
           })

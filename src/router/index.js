@@ -8,6 +8,7 @@ import PageNotFound from "@/views/PageNotFound";
 import Login from "@/views/Login";
 import SignUp from "@/views/SignUp";
 import Books from "@/views/Books";
+import History from "@/views/History";
 import Users from "@/views/Users";
 import MyBooks from "@/views/MyBooks";
 import store from "@/store";
@@ -51,6 +52,16 @@ const routes = [
         meta: {
             navbar: true,
             requiresAuth: true
+        }
+    },
+    {
+        path: '/history',
+        name: 'History',
+        component: History,
+        meta: {
+            navbar: true,
+            requiresAuth: true,
+            requiresAdmin: true
         }
     },
     {

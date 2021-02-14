@@ -5,7 +5,8 @@ const state = {
     myBooks: [],
     unavailableBooks: [],
     authors: [],
-    allBooks: []
+    allBooks: [],
+    history: []
 };
 const getters = {
     getMyBooks: (state) => {
@@ -17,7 +18,8 @@ const getters = {
     getUnavailableBooks: (state) => state.unavailableBooks,
     getAuthors: (state) => {
         return state.authors;
-    }
+    },
+    getWholeHistory: (state) => state.history
 };
 const mutations = {
     setBooks: (state, books) => {
@@ -47,7 +49,9 @@ const mutations = {
     },
     flushMyBooks: (state) => {
         state.myBooks = [];
-    }
+    },
+    addHistory: (state, history) => state.history.push(history),
+    flushWholeHistory: (state) => state.history = []
 };
 const actions = {
     fetchAuthors: ({commit, state}) => {
@@ -67,7 +71,9 @@ const actions = {
                     res.data.history.filter(history => history.user === store.getters["Auth/getUser"]._id).forEach(history => {
                         axios(`/history/${history._id}/extended`)
                             .then(res => {
-                                commit('setMyBook', res.data.history.book);
+                                let book = res.data.history.book;
+                                book['date'] = res.data.history.date;
+                                commit('setMyBook', book);
                             });
                     });
                 });
@@ -90,6 +96,22 @@ const actions = {
                 .then(res => {
                     commit("setBooks", res.data.books);
                 });
+    },
+    fetchWholeHistory: ({commit, state}) => {
+        if (!state.history.length)
+            axios('/history')
+                .then(({data}) => {
+                    data.history.forEach(history => {
+                        axios(`/history/${history._id}/extended`)
+                            .then(({data}) => {
+                                commit('addHistory', data.history);
+                            });
+                    });
+                });
+    },
+    reFetchHistory: ({commit, dispatch}) => {
+        commit('flushWholeHistory');
+        dispatch('fetchWholeHistory');
     },
     reFetchAllBooks: ({commit}) => {
         axios('/books/extended')

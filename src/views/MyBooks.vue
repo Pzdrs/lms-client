@@ -27,10 +27,10 @@
                   <span v-if="new Date(book.date.to).getTime() - new Date(book.date.from) > 0">
                   You have
                   <span v-if="daysLeft(book.date) >= 1">
-                    <strong>{{ daysLeft(book.date) }}</strong> more days to return it.
+                    <strong>{{ daysLeft(book.date) }}</strong> more day(s) to return it.
                   </span>
                     <span v-else>
-                      <strong>{{ hoursLeft(book.date) }}</strong> more hours to return it.
+                      <strong>{{ hoursLeft(book.date) }}</strong> more hour(s) to return it.
                     </span>
                 </span>
                   <span v-else>
