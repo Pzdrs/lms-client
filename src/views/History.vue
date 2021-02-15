@@ -18,11 +18,11 @@
             <label class="checkbox">
               <input type="checkbox" v-model="filter.notReturned" disabled>
               Not returned yet
-            </label>
+            </label><br>
             <label class="checkbox">
               <input type="checkbox" v-model="filter.expired" disabled>
               Expired
-            </label>
+            </label><br>
           </aside>
         </div>
         <div class="column is-8">
@@ -30,11 +30,9 @@
                    v-for="history in applyFilters(getHistory)"
                    :key="history._id">
             <div class="message-header">
-                <span>
-                  <a style="text-decoration: none" target="_blank">
-                    {{ history.book.title }} ({{ history.book.isbn }})
-                  </a>
-                </span>
+              <a style="text-decoration: none" target="_blank">
+                {{ history.book.title }} ({{ history.book.isbn }})
+              </a>
               <span class="has-text-weight-light" v-if="history.book.author !== null">by
                   {{ history.book.author.firstName }}
                   {{ history.book.author.lastName }}
@@ -54,7 +52,12 @@
                   <tr>
                     <th>State</th>
                     <td class="has-text-success" v-if="history.returned">Returned</td>
-                    <td class="has-text-danger" v-else>Not returned yet</td>
+                    <td class="has-text-danger" v-else>
+                      <label>Not returned yet</label>
+                      <button @click="markAsFinal(history)" class="button is-light is-success is-pulled-right">Mark as
+                        returned
+                      </button>
+                    </td>
                   </tr>
                   <tr>
                     <th>User</th>
@@ -133,17 +136,22 @@ export default {
     },
     daysLeft(date) {
       const daysLeft = moment(new Date(date.to)).diff(new Date(date.from), 'd');
-      const hoursLeft = moment(new Date(date.to)).diff(new Date(date.from), 'h');
+      const hoursLeft = moment(date.to).diff(moment(), 'hours');
       return daysLeft > 0 ? '<strong>' + daysLeft + '</strong> day(s) left' : '<strong>' + hoursLeft + '</strong> hour(s) left';
     },
     borrowedPeriod(date) {
       return Math.ceil(moment(new Date(date.to)).diff(new Date(date.from), 'h') / 24);
     },
     applyFilters(history) {
-      return history.filter(({book, user}) =>
+      let filtered = history;
+      filtered.filter(({book, user}) =>
           (book.title.toLowerCase().includes(this.filter.search)) ||
           (book.author.firstName.toLowerCase().includes(this.filter.search) || book.author.lastName.toLowerCase().includes(this.filter.search)) ||
           (this.idToUser(user).firstName.toLowerCase().includes(this.filter.search) || this.idToUser(user).lastName.toLowerCase().includes(this.filter.search)));
+      return filtered;
+    },
+    markAsFinal(history) {
+      this.$store.dispatch('Books/markAsReturned', history);
     }
   }
 }
@@ -154,5 +162,11 @@ export default {
   font-weight: bold;
   color: black;
   text-transform: uppercase;
+}
+
+.returned button, label {
+  margin: 10px 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>

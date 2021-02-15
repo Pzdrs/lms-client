@@ -162,7 +162,6 @@ export default {
   },
   created() {
     this.$store.dispatch('Books/fetchAuthors');
-    this.$store.dispatch('Books/fetchUnavailableBooks');
     this.$store.dispatch('Books/fetchAllBooks');
   },
   methods: {
@@ -208,14 +207,13 @@ export default {
       return this.$store.getters["Auth/getUser"].isAdmin;
     },
     isAvailable(book) {
-      return this.unavailableBooks.includes(book._id);
+      return !book.returned;
     }
   },
   computed: {
     ...mapGetters({
       books: 'Books/getAllBooks',
-      authors: 'Books/getAuthors',
-      unavailableBooks: 'Books/getUnavailableBooks'
+      authors: 'Books/getAuthors'
     }),
     searchPlaceholder() {
       switch (this.nav) {

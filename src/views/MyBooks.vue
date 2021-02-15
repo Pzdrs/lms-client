@@ -12,6 +12,7 @@
       </div>
       <div class="columns is-centered">
         <div class="column is-11">
+          <h1 class="subtitle has-text-centered" v-if="myBooks.length <= 0">Not much of a reader, are you?</h1>
           <article class="message" :class="getColor" v-for="book in filteredBooks" :key="book._id">
             <div class="message-header">
               <a style="text-decoration: none" target="_blank"
@@ -24,7 +25,7 @@
                 <p class="pb-2" style="border-bottom: 1px solid gray;">
                   You borrowed this book on
                   {{ formatBorrowedDate(book.date.from) }}.
-                  <span v-if="new Date(book.date.to).getTime() - new Date(book.date.from) > 0">
+                  <span v-if="!book.returned">
                   You have
                   <span v-if="daysLeft(book.date) >= 1">
                     <strong>{{ daysLeft(book.date) }}</strong> more day(s) to return it.
@@ -82,7 +83,7 @@ export default {
       return moment(date.to).diff(moment(date.from), 'days');
     },
     hoursLeft(date) {
-      return moment(date.to).diff(moment(date.from), 'hours');
+      return moment(date.to).diff(moment(), 'hours');
     },
     normalizeName(title) {
       return require('diacritics').remove(title);

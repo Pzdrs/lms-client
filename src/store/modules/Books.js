@@ -3,7 +3,6 @@ import store from "@/store";
 
 const state = {
     myBooks: [],
-    unavailableBooks: [],
     authors: [],
     allBooks: [],
     history: []
@@ -15,7 +14,6 @@ const getters = {
     getAllBooks: (state) => {
         return state.allBooks;
     },
-    getUnavailableBooks: (state) => state.unavailableBooks,
     getAuthors: (state) => {
         return state.authors;
     },
@@ -51,7 +49,10 @@ const mutations = {
         state.myBooks = [];
     },
     addHistory: (state, history) => state.history.push(history),
-    flushWholeHistory: (state) => state.history = []
+    flushWholeHistory: (state) => state.history = [],
+    markAsFinalLocal: (state, history) => {
+        state.history.filter(({_id}) => _id === history)[0].returned = true;
+    }
 };
 const actions = {
     fetchAuthors: ({commit, state}) => {
@@ -65,26 +66,16 @@ const actions = {
         if (!state.myBooks.length)
             axios('/history')
                 .then(res => {
-                    res.data.history.filter(history => new Date(history.date.to) > new Date()).forEach(history => {
-                        commit('setUnavailableBook', history.book)
-                    });
                     res.data.history.filter(history => history.user === store.getters["Auth/getUser"]._id).forEach(history => {
                         axios(`/history/${history._id}/extended`)
                             .then(res => {
                                 let book = res.data.history.book;
                                 book['date'] = res.data.history.date;
+                                book['returned'] = res.data.history.returned;
                                 commit('setMyBook', book);
                             });
                     });
                 });
-    },
-    fetchUnavailableBooks: ({commit}) => {
-        axios('/history')
-            .then(res => {
-                res.data.history.filter(history => new Date(history.date.to) > new Date()).forEach(history => {
-                    commit('setUnavailableBook', history.book)
-                })
-            })
     },
     reFetchMyBooks: ({commit, dispatch}) => {
         commit('flushMyBooks');
@@ -175,6 +166,16 @@ const actions = {
             .post('/history', payload)
             .then(res => {
                 return res;
+            });
+    },
+    markAsReturned({commit, dispatch}, payload) {
+        return axios
+            .patch(`/history/${payload._id}`, {returned: true})
+            .then(response => {
+                commit('markAsFinalLocal', payload._id);
+                dispatch('reFetchAllBooks')
+                dispatch('reFetchMyBooks')
+                return response;
             });
     }
 };
