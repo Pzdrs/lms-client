@@ -67,7 +67,11 @@ const actions = {
     },
     forgotPassword: (context, payload) => {
         return axios
-            .post('/auth/forgotPass', payload);
+            .post('/auth/forgot', payload);
+    },
+    resetPassword: (context, payload) => {
+        return axios
+            .patch('/auth/reset', payload);
     },
     signOut: () => {
         return axios

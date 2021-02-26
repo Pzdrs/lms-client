@@ -122,7 +122,6 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
     // Set page title
     document.title = `${to.name || 'Welcome'} | Library Management System`;
-
     if (!tokenPresent()) {
         await store.dispatch('Auth/refreshToken')
             .catch(() => {

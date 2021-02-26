@@ -6,7 +6,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(req => {
-    req.headers.Authorization = store.getters["Auth/getAccessToken"];
+    const token = store.getters["Auth/getAccessToken"];
+    if (token) req.headers.Authorization = token;
     return req;
 });
 
