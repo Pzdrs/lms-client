@@ -75,7 +75,7 @@
                   <tr>
                     <th>To be returned</th>
                     <td>{{ dateFormat(history.date.to) }}</td>
-                    <td class="is-hidden-mobile"><span v-html="daysLeft(history.date)"/> to return</td>
+                    <td class="is-hidden-mobile"><span v-html="daysLeft(history.date)"/></td>
                   </tr>
                   </tbody>
                 </table>
@@ -135,9 +135,10 @@ export default {
       return moment(new Date(date)).format('MMMM Do YYYY');
     },
     daysLeft(date) {
-      const daysLeft = moment(new Date(date.to)).diff(new Date(date.from), 'd');
-      const hoursLeft = moment(date.to).diff(moment(), 'hours');
-      return daysLeft > 0 ? '<strong>' + daysLeft + '</strong> day(s) left' : '<strong>' + hoursLeft + '</strong> hour(s) left';
+      const daysLeft = moment(new Date(date.to)).diff(new Date(), 'd');
+      const hoursLeft = moment(new Date(date.to)).diff(new Date(), 'hours');
+      if (hoursLeft <= 0) return 'Should have already been returned';
+      return (daysLeft > 0 ? '<strong>' + daysLeft + '</strong> day(s) left' : '<strong>' + hoursLeft + '</strong> hour(s) left') + ' to return';
     },
     borrowedPeriod(date) {
       return Math.ceil(moment(new Date(date.to)).diff(new Date(date.from), 'h') / 24);
