@@ -89,7 +89,7 @@ export default {
   name: "ForgotPassword",
   data() {
     return {
-      email: 'petrbohac3@seznam.cz',
+      email: '',
       emailSent: false,
       newPass: '',
       newPassConfirm: ''
@@ -98,9 +98,6 @@ export default {
   methods: {
     sendEmail() {
       this.$store.dispatch('Auth/forgotPassword', {email: this.email})
-          .then(res => {
-            console.log(res)
-          })
           .catch(err => {
             console.log(err.response);
           })

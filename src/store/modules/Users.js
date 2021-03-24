@@ -16,7 +16,7 @@ const actions = {
             return axios('/users')
                 .then(res => {
                     commit('setUsers', res.data.users);
-                });
+                });0
     },
     reFetchUsers: ({commit}) => {
         return axios('/users')

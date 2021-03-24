@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from "@/store";
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api'
+    baseURL: 'https://pycrs.rocks:444/api'
 });
 
 api.interceptors.request.use(req => {
